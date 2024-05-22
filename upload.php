@@ -19,44 +19,46 @@ try {
     <?php
     die();
 }
-if (isset($_FILES['video'])) {
-    $fileName = $_FILES['video']['name'];
-    $fileTmpName = $_FILES['video']['tmp_name'];
-    $fileSize = $_FILES['video']['size'];
-    $fileError = $_FILES['video']['error'];
-    $fileType = $_FILES['video']['type'];
-
-    // Vérifier s'il n'y a pas d'erreur lors du téléchargement
-    if ($fileError === 0) {
-        // Verifier si le dossier de destination existe
-        !is_dir('uploads/') && mkdir('uploads/');
-
-        // Définir le chemin de destination
-        $fileDestination = 'uploads/' . $fileName;
-
-        // Déplacer le fichier téléchargé vers le dossier de destination
-        if (move_uploaded_file($fileTmpName, $fileDestination)) {
-            // Préparer et exécuter la requête d'insertion
-            $sql = "INSERT INTO videos (name, path, size, type) VALUES (:name, :path, :size, :type)";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':name' => $fileName,
-                ':path' => $fileDestination,
-                ':size' => $fileSize,
-                ':type' => $fileType
-            ]);
-
-            $msg = "Vidéo téléchargée et enregistrée avec succès !";
+if(isset($_POST['submit'])){
+    if (isset($_FILES['video'])) {
+        $fileName = $_FILES['video']['name'];
+        $fileTmpName = $_FILES['video']['tmp_name'];
+        $fileSize = $_FILES['video']['size'];
+        $fileError = $_FILES['video']['error'];
+        $fileType = $_FILES['video']['type'];
+    
+        // Vérifier s'il n'y a pas d'erreur lors du téléchargement
+        if ($fileError === 0) {
+            // Verifier si le dossier de destination existe
+            !is_dir('uploads/') && mkdir('uploads/');
+    
+            // Définir le chemin de destination
+            $fileDestination = 'uploads/' . $fileName;
+    
+            // Déplacer le fichier téléchargé vers le dossier de destination
+            if (move_uploaded_file($fileTmpName, $fileDestination)) {
+                // Préparer et exécuter la requête d'insertion
+                $sql = "INSERT INTO videos (name, path, size, type) VALUES (:name, :path, :size, :type)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    ':name' => $fileName,
+                    ':path' => $fileDestination,
+                    ':size' => $fileSize,
+                    ':type' => $fileType
+                ]);
+    
+                $msg = "Vidéo téléchargée et enregistrée avec succès !";
+            } else {
+                $msg = "Erreur lors du déplacement du fichier téléchargé.";
+            }
         } else {
-            $msg = "Erreur lors du déplacement du fichier téléchargé.";
+            $msg = "Erreur lors du téléchargement du fichier : $fileError";
         }
-    } else {
-        $msg = "Erreur lors du téléchargement du fichier : $fileError";
     }
 }
 
 // Afficher toutes les videos de la base des donnees
 // Requête pour récupérer toutes les vidéos
-$sql = "SELECT * FROM videos";
+$sql = "SELECT * FROM videos ORDER BY `id` DESC";
 $stmt = $conn->query($sql);
 ?>
