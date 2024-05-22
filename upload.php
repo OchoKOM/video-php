@@ -58,7 +58,7 @@ if(isset($_POST['submit'])){
 }
 
 // Afficher toutes les videos de la base des donnees
-// Requête pour récupérer toutes les vidéos
+// Requête pour récupérer toutes les vidéos par ordre decroissant
 $sql = "SELECT * FROM videos ORDER BY `id` DESC";
 $stmt = $conn->query($sql);
 ?>
